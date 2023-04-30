@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<fmiModelDescription fmiVersion="3.0-beta.1" modelName="Pipeline_configurable" instantiationToken="{e1059e19-5a7b-4dd8-8ee3-6ce4fd3e0cf8}">
+  <CoSimulation modelIdentifier="Pipeline_configurable" canHandleVariableCommunicationStepSize="true" canReturnEarlyAfterIntermediateUpdate="true" hasEventMode="true"/>
+  <ModelVariables>
+    <Int32 name="A" valueReference="1001" causality="input" variability="discrete" clocks="1002"/>
+    <Clock name="A_Clock" valueReference="1002" causality="input" variability="discrete" interval="triggered"/>
+    <Int32 name="X" valueReference="1003" causality="input" variability="discrete" clocks="1004"/>
+    <Clock name="X_Clock" valueReference="1004" causality="input" variability="discrete" interval="triggered"/>
+    <Int32 name="C" valueReference="2001" causality="output" variability="discrete" clocks="2002"/>
+    <Clock name="C_Clock" valueReference="2002" causality="output" variability="discrete" interval="triggered"/>
+    <Int32 name="D" valueReference="2003" causality="output" variability="discrete" clocks="2004"/>
+    <Clock name="D_Clock" valueReference="2004" causality="output" variability="discrete" interval="triggered"/>
+    <Clock name="__DUMMY" valueReference="999" causality="output" variability="discrete" interval="triggered"/>
+  </ModelVariables>
+  <ModelStructure>
+    <Output valueReference="2001" dependencies="1001 1003"/>
+    <Output valueReference="2003" dependencies="1001 1003"/>
+  </ModelStructure>
+</fmiModelDescription>
