@@ -48,24 +48,19 @@ class Collector(mosaik_api.Simulator):
 
     def finalize(self):
         new_dict = {}
-#        print('\n Collected data:')
-#        for sim, sim_data in sorted(self.data.items()):
-#            # print('- %s:' % sim)
-#            for attr, values in sorted(sim_data.items()):
-#                print('  - %s: %s' % (attr, values))
-#                new_dict[(attr)] = values
-#        with open('ps_in.csv', 'w') as f:
-#          for key in new_dict['ps_in'].keys():
-#            f.write("%s,%s\n"%(key,new_dict['ps_in'][key][0]))
-#        df = pd.DataFrame(new_dict)
-#        print(df)
-        # df['u3'] = df['u3'].fillna([0])
-        # print(df["u3"])
-#        df2 = pd.DataFrame([df.ps_in.values.tolist()])
-#        print(df2)
-#        df2.plot()
-#        plt.show();
-#        plt.savefig("ps_in.pdf", dpi = 300)    
+        print('\n Collected data:')
+        for sim, sim_data in sorted(self.data.items()):
+            # print('- %s:' % sim)
+            for attr, values in sorted(sim_data.items()):
+                print('  - %s: %s' % (attr, values))
+                new_dict[(attr)] = values
+        with open('ps_in.csv', 'w') as f:
+          for key in new_dict['ps_in'].keys():
+            f.write("%s,%s\n"%(key,new_dict['ps_in'][key][0]))
+        df = pd.DataFrame(new_dict)
+        print("-----------------------------------------")
+        print(df)
+        df.to_json('output.json')
 
 
 if __name__ == '__main__':
