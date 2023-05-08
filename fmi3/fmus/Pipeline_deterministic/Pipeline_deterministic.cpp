@@ -5,7 +5,8 @@
  **************************************************************************/
 
 #include "Pipeline_deterministic.h"
-
+#include <ostream>
+#include <iostream>
 #include <limits>
 #include <algorithm>
 #include <stdexcept>
@@ -25,8 +26,8 @@ Pipeline_deterministic::Pipeline_deterministic(
     const fmi3ValueReference requiredIntermediateVariables[],
     size_t nRequiredIntermediateVariables,
     fmi3InstanceEnvironment instanceEnvironment,
-    fmi3CallbackLogMessage logMessage,
-    fmi3CallbackIntermediateUpdate intermediateUpdate
+    fmi3LogMessageCallback logMessage,
+    fmi3IntermediateUpdateCallback intermediateUpdate
 ) :
     InstanceBase(
         instanceName,
@@ -42,8 +43,10 @@ Pipeline_deterministic::Pipeline_deterministic(
         logMessage,
         intermediateUpdate
     ),
+    eventHappenedInternal(fmi3False),
     in_( 0 ),
     out_( 0 ),
+    eventResolution_ (1e-15),
     randomSeed_( 1 ),
     randomMean_( 0.5 ),
     randomStdDev_( 0.15 ),
@@ -121,17 +124,18 @@ Pipeline_deterministic::exitInitializationMode()
 
 fmi3Status 
 Pipeline_deterministic::enterEventMode(
-    fmi3Boolean stepEvent,
+    /*fmi3Boolean stepEvent,
     fmi3Boolean stateEvent,
     const fmi3Int32 rootsFound[],
     size_t nEventIndicators,
-    fmi3Boolean timeEvent
+    fmi3Boolean timeEvent*/
 ) {
     this->setMode( eventMode );
     
     // This is a time event that was previously signaled by function doStep.
     // This means that a new message is available to be received by the importer.
-    if ( fmi3True == timeEvent ) 
+    //std::cout << "  eventHappenedInternal=" << this->eventHappenedInternal << std::endl << std::flush;
+    if ( fmi3True == this->eventHappenedInternal )
     {
         *( *this->currentEvent_ )->receiver = ( *this->currentEvent_ )->msgId;
         *( *this->currentEvent_ )->clock = fmi3ClockActive;
@@ -193,17 +197,17 @@ fmi3Status
 Pipeline_deterministic::getClock(
     const fmi3ValueReference valueReferences[],
     size_t nValueReferences,
-    fmi3Clock values[],
-    size_t nValues
+    fmi3Clock values[]
 ) {
-    if ( nValueReferences != nValues ) {
+    //std::cout << ">> Pipeline_deterministic::getClock" << std::endl << std::flush;
+    /*if ( nValueReferences != nValues ) {
         this->logError(
             "%s %s",
             "This FMU only supports scalar variables.",
             "The number of value references and values must match!"
         );
         return fmi3Error;
-    }
+    }*/
 
     fmi3Status status = fmi3OK;
     const fmi3ValueReference* vr;
@@ -211,7 +215,7 @@ Pipeline_deterministic::getClock(
 
     for (
         vr = valueReferences, v = values;
-        vr != valueReferences + nValues, v != values + nValues;
+        vr != valueReferences + nValueReferences, v != values + nValueReferences;
         ++vr, ++v
     ) {
         switch ( *vr ) {
@@ -297,6 +301,9 @@ Pipeline_deterministic::setFloat64(
         ++vr, ++v
     ) {
         switch ( *vr ) {
+            case this->vrEventResolution_:
+                this->eventResolution_ = *v;
+                break;
             case this->vrRandomMean_:
                 this->randomMean_ = *v;
                 break;
@@ -323,17 +330,17 @@ fmi3Status
 Pipeline_deterministic::setClock(
     const fmi3ValueReference valueReferences[],
     size_t nValueReferences,
-    const fmi3Clock values[],
-    size_t nValues
-) {
-    if ( nValueReferences != nValues ) {
+    const fmi3Clock values[])
+{
+    //std::cout << ">> Pipeline_deterministic::setClock" << std::endl << std::flush;
+/*    if ( nValueReferences != nValues ) {
         this->logError(
             "%s %s",
             "This FMU only supports scalar variables.",
             "The number of value references and values must match!"
         );
         return fmi3Error;
-    }
+    }*/
 
     fmi3Status status = fmi3OK;
     const fmi3ValueReference* vr;
@@ -341,7 +348,7 @@ Pipeline_deterministic::setClock(
 
     for (
         vr = valueReferences, v = values;
-        vr != valueReferences + nValues, v != values + nValues;
+        vr != valueReferences + nValueReferences, v != values + nValueReferences;
         ++vr, ++v
     ) {
         switch ( *vr ) {
@@ -399,7 +406,8 @@ Pipeline_deterministic::updateDiscreteStates(
     }
 
     // Event queue is empty, next event time is undefined.
-    if ( this->eventQueue_.empty() )
+    //if ( this->eventQueue_.empty() )
+    if ( this->currentEvent_ == this->eventQueue_.end() )
     {
         this->nextEventTime_ = std::numeric_limits<fmi3Float64>::max();
         *nextEventTimeDefined = fmi3False;
@@ -462,12 +470,13 @@ Pipeline_deterministic::doStep(
 ) {
     // Sanity check: Do the importer's current communication point and the internal
     // synchronization time coincide?
-    if ( fabs( this->syncTime_ - currentCommunicationPoint ) > this->tolerance_ )
+    if ( fabs( this->syncTime_ - currentCommunicationPoint ) > (this->tolerance_*1.000001) )
     {
-        this->logError(
-            "Current communication point (%f) does not coincide with the internal time (%f)",
-            currentCommunicationPoint, this->syncTime_
-        );
+        std::cout << "Current communication point (" << currentCommunicationPoint << ") does not coincide with the internal time (" << this->syncTime_ << ") " << " within tolerance " << this->tolerance_ << "." << std::endl;
+        //this->logError(
+        //    "Current communication point (%f) does not coincide with the internal time (%f)",
+        //    currentCommunicationPoint, this->syncTime_
+        //);
 
         return fmi3Discard;
     }
@@ -481,7 +490,7 @@ Pipeline_deterministic::doStep(
     );
 
     // The importer stepped over an event.
-    if ( this->syncTime_ > this->nextEventTime_ )
+    if ( this->syncTime_ > (this->nextEventTime_-tolerance) )
     {
         this->logDebug(
             "%s %s %f",
@@ -491,6 +500,7 @@ Pipeline_deterministic::doStep(
         );
 
         *eventEncountered = fmi3True;
+        eventHappenedInternal = fmi3True;
         *earlyReturn = fmi3True;
         *lastSuccessfulTime = this->nextEventTime_;
     }
@@ -512,6 +522,7 @@ Pipeline_deterministic::doStep(
         }
 
         *eventEncountered = fmi3True;
+        eventHappenedInternal = fmi3True;
         *earlyReturn = fmi3False;
         *lastSuccessfulTime = this->syncTime_;
     }
@@ -522,6 +533,7 @@ Pipeline_deterministic::doStep(
         );
 
         *eventEncountered = fmi3False;
+        eventHappenedInternal = fmi3False;
         *earlyReturn = fmi3False;
         *lastSuccessfulTime = this->syncTime_;
     }
@@ -581,10 +593,12 @@ fmi3Float64
 Pipeline_deterministic::calculateDelay()
 {
     // No negative delays!
-    return std::max(
+    double randomValue= std::max(
         this->distribution_( this->generator_ ),
         this->randomMin_
     );
+    double roundedValue=std::floor(randomValue/eventResolution_)*eventResolution_;
+    return roundedValue;
 }
 
 void

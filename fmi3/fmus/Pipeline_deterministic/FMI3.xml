@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fmiModelDescription fmiVersion="3.0-beta.1" modelName="Pipeline_deterministic" instantiationToken="{a67992a0-a385-11eb-aea4-00155d0bce5e}">
+<fmiModelDescription fmiVersion="3.0-beta.5" modelName="Pipeline_deterministic" instantiationToken="{a67992a0-a385-11eb-aea4-00155d0bce5e}">
  <CoSimulation modelIdentifier="Pipeline_deterministic" canHandleVariableCommunicationStepSize="true" canReturnEarlyAfterIntermediateUpdate="true" hasEventMode="true"/>
  <ModelVariables>
-  <Int32 name="in" valueReference="1001" causality="input" variability="discrete" clocks="1002"/>
-  <Clock name="inClock" valueReference="1002" causality="input" variability="discrete" interval="triggered"/>
+  <Float64 name="time" valueReference="0" causality="independent" variability="continuous" description="Simulation time"/>
+  <Int32 name="in" valueReference="1001" causality="input" variability="discrete" clocks="1002" start="-1"/>
+  <Clock name="inClock" valueReference="1002" causality="input" intervalVariability="triggered"/>
   <Int32 name="out" valueReference="2001" causality="output" variability="discrete" clocks="2002"/>
-  <Clock name="outClock" valueReference="2002" causality="output" variability="discrete" interval="triggered"/>
-  <Int32 name="randomSeed" valueReference="3001" causality="parameter" variability="fixed"/>
-  <Float64 name="randomMean" valueReference="3002" causality="parameter" variability="fixed"/>
-  <Float64 name="randomStdDev" valueReference="3003" causality="parameter" variability="fixed"/>
-  <Float64 name="randomMin" valueReference="3003" causality="parameter" variability="fixed"/>
+  <Clock name="outClock" valueReference="2002" causality="output" intervalVariability="triggered"/>
+  <Float64 name="eventResolution" valueReference="3000" causality="parameter" variability="fixed" start="1e-15"/>
+  <Int32 name="randomSeed" valueReference="3001" causality="parameter" variability="fixed" start="4567"/>
+  <Float64 name="randomMean" valueReference="3002" causality="parameter" variability="fixed" start="100"/>
+  <Float64 name="randomStdDev" valueReference="3003" causality="parameter" variability="fixed" start="50"/>
+  <Float64 name="randomMin" valueReference="3004" causality="parameter" variability="fixed" start="30"/>
  </ModelVariables>
  <ModelStructure>
   <Output valueReference="2001" dependencies="1001 1002"/>

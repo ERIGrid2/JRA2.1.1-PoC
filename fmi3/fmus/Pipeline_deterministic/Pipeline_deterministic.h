@@ -16,6 +16,8 @@ class Pipeline_deterministic : public InstanceBase {
 
 public:
 
+    fmi3Boolean eventHappenedInternal;
+
     Pipeline_deterministic(
         fmi3String instanceName,
         fmi3String instantiationToken,
@@ -27,8 +29,8 @@ public:
         const fmi3ValueReference requiredIntermediateVariables[],
         size_t nRequiredIntermediateVariables,
         fmi3InstanceEnvironment instanceEnvironment,
-        fmi3CallbackLogMessage logMessage,
-        fmi3CallbackIntermediateUpdate intermediateUpdate
+        fmi3LogMessageCallback logMessage,
+        fmi3IntermediateUpdateCallback intermediateUpdate
     );
 
     virtual fmi3Status enterInitializationMode(
@@ -42,11 +44,11 @@ public:
     virtual fmi3Status exitInitializationMode();
 
     virtual fmi3Status enterEventMode(
-        fmi3Boolean stepEvent,
+        /*fmi3Boolean stepEvent,
         fmi3Boolean stateEvent,
         const fmi3Int32 rootsFound[],
         size_t nEventIndicators,
-        fmi3Boolean timeEvent
+        fmi3Boolean timeEvent*/
     );
 
     virtual fmi3Status reset();
@@ -61,8 +63,7 @@ public:
     virtual fmi3Status getClock(
         const fmi3ValueReference valueReferences[],
         size_t nValueReferences,
-        fmi3Clock values[],
-        size_t nValues
+        fmi3Clock values[]
     );
 
     virtual fmi3Status setFloat64(
@@ -82,8 +83,7 @@ public:
     virtual fmi3Status setClock(
         const fmi3ValueReference valueReferences[],
         size_t nValueReferences,
-        const fmi3Clock values[],
-        size_t nValues
+        const fmi3Clock values[]
     );
 
     virtual fmi3Status updateDiscreteStates(
@@ -134,6 +134,10 @@ private:
     // Output clock "out_clock" (value reference 2002).
     fmi3Clock outClock_;
     static const fmi3ValueReference vrOutClock_ = 2002;
+
+    // Permissible time granularity of the events generated, for importers with minimum time steps like mosaik3 (parameter, value reference 3000).
+    fmi3Float64 eventResolution_;
+    static const fmi3ValueReference vrEventResolution_ = 3000;
 
 	// Random number generator seed (parameter, value reference 3001).
 	fmi3Int32 randomSeed_;

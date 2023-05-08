@@ -38,7 +38,7 @@ namespace DeterministicEventQueue
         {}
 	};
 
-    static Tolerance tolerance = 1e-9;
+    static Tolerance tolerance = 1e-2;
 
 	// This functor defines that events are sorted in the event queue according to their timestamp.
 	struct EventOrder {
