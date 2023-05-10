@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(JRA-2.1.1_dummy_fmu)
 
-set(MODEL_NAMES Pipeline_deterministic Pipeline_unpredictable Pipeline_configurable)
+set(MODEL_NAMES Pipeline_deterministic)
 
 set(FMI_VERSION 3)
 
