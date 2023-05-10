@@ -1,5 +1,7 @@
-!**/__pycache__/
-python/*fmu
+**/__pycache__/
+python/**/*fmu
+python/**/*csv
+python/**/*json
 fmus/*
-fmi3/build
+fmi3/build/
 
