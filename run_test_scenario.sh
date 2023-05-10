@@ -1,2 +1,2 @@
-cd python
+cd python/test_scenario
 python scenario_testing_collector.py
