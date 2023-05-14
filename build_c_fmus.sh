@@ -1,3 +1,4 @@
+mkdir -p fmus
 cd fmi3
 mkdir build
 cd build

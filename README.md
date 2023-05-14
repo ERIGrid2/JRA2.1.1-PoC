@@ -15,7 +15,8 @@ The following prerequisites need to be installed in order to compile and run cor
 * python >= 3.10 (earlier 3.x versions of python may work but haven't been tested)
 
 #### Python packages
-* [FMPy >= 0.3.15 in order to generate FMUs for the python-based simulators (Pandapower etc.)](https://github.com/CATIA-Systems/FMPy)
+* [FMPy >= 0.3.15 in order to generate python-based FMUs](https://github.com/CATIA-Systems/FMPy)
+* [pythonfmu >= 0.6.2 in order to generate C FMUs for the python-based simulators (Pandapower etc.)](https://github.com/NTNU-IHB/PythonFMU)
 * [Mosaik 3 as a cosimulation master](https://mosaik.offis.de)
 * [Pandas is currently used by the collector class for data storage and serialisation.](https://pandas.pydata.org)
 * [Matplotlib for visualisation (currently disabled, but the dependency remains for later use.](https://matplotlib.org)
