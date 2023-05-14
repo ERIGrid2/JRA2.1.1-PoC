@@ -2,6 +2,7 @@
 python/**/*fmu
 python/**/*csv
 python/**/*json
+python/**/*_nw.p
 fmus/*
 fmi3/build/
 
