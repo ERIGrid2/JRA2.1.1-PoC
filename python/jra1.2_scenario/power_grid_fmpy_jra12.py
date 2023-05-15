@@ -19,7 +19,7 @@ META = {
         'pandapower_LV': {
             'public': True,
             'params': [],
-            'attrs': ['deltaP', 'L_3', 'L_4', 'V3',],
+            'attrs': ['deltaP', 'L_3', 'L_4', 'V3'],
             # 'attrs': ['tap', 'L_3', 'L_4', 'V3', 'v4'],
         },
     },
@@ -69,7 +69,7 @@ class pandapower_LV_jra12(mosaik_api.Simulator):
         self.vr_inputs = [self.vrs['P_load3'], self.vrs['P_load4'], self.vrs['P_loadVar']]
         # self.vr_outputs = [self.vrs['Vmpu_bus3'], self.vrs['Vmpu_bus4']] 
         # for single output
-        self.vr_outputs = [self.vrs['Vmpu_bus3']] 
+        self.vr_outputs = [self.vrs['Vmpu_bus3']]
         print(self.vrs)
         print("Init of power system via mosaik successful")
         return self.meta
@@ -146,15 +146,23 @@ class pandapower_LV_jra12(mosaik_api.Simulator):
                 if l3 is not None: self.vrs['P_load3'] = l3
                 if l4 is not None: self.vrs['P_load4'] = l4
                 if deltaP is not None:
-                    self.vrs['P_loadVar'] = deltaP
+                    dxp=deltaP[0]*1e-3
+                    self.vrs['P_loadVar'] = (15e-3)+dxp
+                    print("+++++++++++++++++++++ ",deltaP[0])
+                    print("///////////////////// ",dxp)
+                    print("--------------------- ",self.vrs['P_loadVar'])
         
-                load_3 = self.load_ramp(load_high = 5e-3, load_low = 2e-3, ramp_time = self.stop_time,  t = time )
+                load_3 = self.load_ramp(load_high = 5e-3, load_low = 2e-3, ramp_time = self.stop_time/2,  t = time )
                 # print(type (load_3))
-                load_4 = self.load_ramp(load_high = 7e-3, load_low = 4e-3, ramp_time = self.stop_time,  t = time )
+                load_4 = self.load_ramp(load_high = 7e-3, load_low = 4e-3, ramp_time = self.stop_time/2,  t = time )
                 # tap_pos = 0        
                 # self._entities[eid].setReal([self.vr_inputs], [load_3, load_4])
                 self._entities[eid].setReal([self.vr_inputs[0]], [load_3])
                 self._entities[eid].setReal([self.vr_inputs[1]], [load_4])
+                if deltaP is not None:
+                    dxr=(15e-3)+(deltaP[0]*1e-3)
+
+                    self._entities[eid].setReal([self.vr_inputs[2]], [dxr])
                 # print("Error is here")
 
                 communication_point = self.fmutimes[eid]

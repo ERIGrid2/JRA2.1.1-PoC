@@ -21,7 +21,7 @@ def create_network():
     # create loads
     pp.create_load(net, bus3, p_mw=3e-3, q_mvar=0.96e-3, name="load3")
     pp.create_load(net, bus4, p_mw=3e-3, q_mvar=0.96e-3, name="load4")
-    pp.create_load(net, bus4, p_mw=10e-3, q_mvar=0.0, name="loadVar")
+    pp.create_load(net, bus3, p_mw=15e-3, q_mvar=0.0, name="loadVar")
     return net
 
 def run_pf():
