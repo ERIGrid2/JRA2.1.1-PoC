@@ -179,7 +179,8 @@ class pandapower_LV_jra12(mosaik_api.Simulator):
                 'V3': self._entities[eid].getReal([self.vr_outputs[0]]),
             }
 
-        return int(time + (1 / self.time_resolution)) # self.step_size
+        # return int(time + (1 / self.time_resolution)) # self.step_size
+        return int(time + 10)
     
     def get_data(self, outputs):
         data = {}

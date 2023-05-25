@@ -61,6 +61,7 @@ class Collector(mosaik_api.Simulator):
         print("-----------------------------------------")
         print(df)
         df.to_json('output.json')
+        df.sort_index().to_csv('output.csv')
 
 
 if __name__ == '__main__':

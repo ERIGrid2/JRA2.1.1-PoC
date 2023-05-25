@@ -71,7 +71,8 @@ class Singlepipe(mosaik_api.Simulator):
                 #print('.........? Would be calling FMI3EnterEventMode here')
                 #print('.........? Would be calling FMI3SetValue here')
                 #print('.........? Would be calling FMI3SetClock here')
-                delayed_time = 0.5177645315523848+self.time
+                # delayed_time = 0.5177645315523848+self.time
+                delayed_time = 5+self.time
                 self.mqueue.append({'value':msg_in, 'out_time':delayed_time})
                 self.tqueue.append({'time':delayed_time})
                 print("Incoming message. MQueue is now "+str(self.mqueue))

@@ -36,14 +36,14 @@ sim_config = {
 
 
 # Set scenario parameters:
-STOP = 10 * 60* MT_PER_SEC  # 10 minutes
+STOP = 11 * MT_PER_SEC  # 10 minutes
 START = 0
 # Set up the "world" of the scenario
 world = mosaik.World(sim_config, time_resolution=1/MT_PER_SEC, debug=True)
 
 # Initialize the simulators
 periodic_sender_sim = world.start( 'PeriodicSender', verbose=False )
-sender_U3 = periodic_sender_sim.PeriodicSender( period = 60.0*MT_PER_SEC )
+sender_U3 = periodic_sender_sim.PeriodicSender( period = 60.0)
 
 # Simulator for power system
 loadflow_sim = world.start('Grid', fmu_filename = '../../fmus/Pandapower_LV_jra12.fmu', instance_name ='powerflow1', start_time = 0.0, stop_time = STOP)
@@ -51,7 +51,7 @@ loadflow = loadflow_sim.pandapower_LV.create(1)[0]
 
 # Simulator for controller.
 controller_sim = world.start( 'Ctrl', dead_time= 0,
-    fmu_filename = '../../fmus/controller_voltage.fmu', instance_name='Controller1',step_size = 1e-1*MT_PER_SEC,
+    fmu_filename = '../../fmus/controller_voltage.fmu', instance_name='Controller1',step_size = 1e-1,
     start_time=0, stop_time=STOP,seconds_per_mosaik_timestep=1./MT_PER_SEC)
 controller =  controller_sim.voltage_controller.create(1)[0]
 
@@ -89,6 +89,6 @@ world.connect( controller, loadflow, 'deltaP' , time_shifted=True, initial_data=
 world.connect( loadflow, monitor, ('V3', 'ps_in'))
 world.connect( sender_U3, monitor, ('ps_out', 'msg_in'))
 world.connect( comm_network, monitor, ('msg_out', 'u3'))
-world.connect( controller, monitor, 'deltaP' )
+world.connect( controller, monitor, ('deltaP', 'deltaP') )
 
 world.run(until=STOP, print_progress=True)
