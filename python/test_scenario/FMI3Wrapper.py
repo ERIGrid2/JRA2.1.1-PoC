@@ -57,6 +57,8 @@ class FMI3Wrapper:
         ('fmi3EnterInitializationMode',{'retval':c_int , 'args':[c_void_p,c_char,c_double,c_double,c_char,c_double]}),
         ('fmi3ExitInitializationMode',{'retval':c_int , 'args':[c_void_p]}),
         ('fmi3Terminate',{'retval':c_int ,'args':[c_void_p]}),
+        ('fmi3SetFloat64',{'retval':c_int, 'args':[c_void_p,POINTER(c_int),c_size_t,POINTER(c_double),c_size_t]}),
+        ('fmi3GetFloat64',{'retval':c_int, 'args':[c_void_p,POINTER(c_int),c_size_t,POINTER(c_double),c_size_t]}),
         ('fmi3SetInt32',{'retval':c_int, 'args':[c_void_p,POINTER(c_int),c_size_t,POINTER(c_int),c_size_t]}),
         ('fmi3GetInt32',{'retval':c_int, 'args':[c_void_p,POINTER(c_int),c_size_t,POINTER(c_int),c_size_t]}),
         ('fmi3GetClock',{'retval':c_int, 'args':[c_void_p,POINTER(c_int),c_size_t,POINTER(c_bool),c_size_t]}),
@@ -164,6 +166,11 @@ class FMI3Wrapper:
         return (( c_int * nl )( *l ),
             c_size_t( nl ))
 
+    def list_to_cdouble_array(self,d):
+        nd = len(d)
+        return (( c_double * nd ) ( *d ),
+            c_size_t( nd ))
+
     def bool_list_to_cchar_array(self,l):
         nl = len(l)
         return (( c_char * nl )( *[self.fmi3_true if x is True else self.fmi3_false for x in l] ),
@@ -261,6 +268,37 @@ class FMI3Wrapper:
 ### Getting and setting variables values
 ###########################################################
 
+    def fmi3SetFloat64( self, value_references, values):
+        if not self.fmi_component:
+            raise RuntimeError('Trying to set a variable in an uninstantiated FMU')
+        var_ref_ids = []
+        for name in value_references:
+            var_ref_ids.append( self.fmu_var_dict[name] )
+        status = self.call('fmi3SetFloat64')(
+            self.fmi_component,
+            *self.list_to_cint_array(var_ref_ids),
+            *self.list_to_cdouble_array(values)
+            )
+        assert( status == self.fmi3_ok )
+        return status
+
+    def fmi3GetFloat64( self, value_references):
+        if not self.fmi_component:
+            raise RuntimeError('Trying to get a variable in an uninstantiated FMU')
+        var_ref_ids = []
+        for name in value_references:
+            var_ref_ids.append( self.fmu_var_dict[name] )
+        nvars=len(var_ref_ids)
+        var_values = (c_double*nvars)()
+        status = self.call('fmi3GetFloat64')(
+            self.fmi_component,
+            *self.list_to_cint_array(var_ref_ids),
+            var_values,
+            nvars
+            )
+        assert( status == self.fmi3_ok )
+        return var_values
+
     def fmi3SetInt32( self, value_references, values):
         if not self.fmi_component:
             raise RuntimeError('Trying to set a variable in an uninstantiated FMU')
@@ -327,10 +365,10 @@ class FMI3Wrapper:
         assert( status == self.fmi3_ok )
         return status
 
-    def fmi3UpdateDiscreteStates( self, next_event_time ):
+    def fmi3UpdateDiscreteStates( self ):
         if not self.fmi_component:
             raise RuntimeError('Trying to update an uninstantiated FMU')
-        result=Discrete_update_result(0,False,False,False,False,False,next_event_time)
+        result=Discrete_update_result(0,False,False,False,False,False,sys.float_info.max)
         xds=self.bool_to_c_char(result.discrete_states_need_update)
         xts=self.bool_to_c_char(result.terminate_simulation)
         xnc=self.bool_to_c_char(result.nominals_of_continuous_states_changed)

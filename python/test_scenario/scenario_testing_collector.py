@@ -27,7 +27,7 @@ sim_config = {
             'python': 'periodic_sender_fmpy:PeriodicSender',
     },
     'CommSim':{
-        'python': 'fmi_singlepipe_python_dummy:Singlepipe',
+        'python': 'fmi_singlepipe:Singlepipe',
     },
     'Collector': {
         'cmd': '%(python)s collector.py %(addr)s',
@@ -66,7 +66,8 @@ collector = world.start('Collector')
 
 # dummy simulator for the comms
 
-comm_network_sim = world.start( 'CommSim')
+comm_network_sim = world.start( 'CommSim', fmu_filename = '../../fmus/Pipeline_deterministic.fmu',
+                                           instance_name = 'test_sim_ict', start_time = 0.0, stop_time = STOP)
 comm_network = comm_network_sim.Singlepipe()
 
 # data collector
