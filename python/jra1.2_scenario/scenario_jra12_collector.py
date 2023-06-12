@@ -79,7 +79,7 @@ world.connect( sender_U3, comm_network, ( 'ps_out', 'msg_in' ))
 world.connect( comm_network, controller, ( 'msg_out', 'u3' ))
 #world.connect( comm_network, controller, ( 'msg_out', 'voltage_in' ) )
 
-# #  # Connect output from controller to OLTC.
+# #  # Connect output from controller to variable load.
 world.connect( controller, loadflow, 'deltaP' , time_shifted=True, initial_data={'deltaP':0})
 # world.connect( controller, comm_network, ( 'tap', 'ctrl_send' ) )
 # # world.connect( comm_network, tap_actuator, ( 'ctrl_receive', 'tap_setpoint' ) )

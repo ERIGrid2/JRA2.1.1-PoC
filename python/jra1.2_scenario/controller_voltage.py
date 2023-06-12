@@ -52,11 +52,11 @@ class controller_voltage(Fmi2Slave):
         v_high = self.v_up
         
         if (u3 > v_high):
-            self.deltaP += 1
+            self.deltaP += 2
         if (u3 < v_low):
-            self.deltaP -= 1
-        if(self.deltaP > 2):
-            self.deltaP = 2
-        elif(self.deltaP < -2):
-            self.deltaP = -2
+            self.deltaP -= 2
+        if(self.deltaP > 10):
+            self.deltaP = 10
+        elif(self.deltaP < -10):
+            self.deltaP = -10
         return True

@@ -14,7 +14,7 @@ class Pandapower_LV_jra12(Fmi2Slave):
         self.Q_load3 = 0.96e-3 
         self.P_load4 = 3e-3
         self.Q_load4 = 0.96e-3 
-        self.P_loadVar = 0
+        self.P_loadVar = 15e-3
         self.Vmpu_bus3 = 1.0
         self.Vmpu_bus4 = 1.0
         # fmi inputs: active power of loads and tap
@@ -31,7 +31,8 @@ class Pandapower_LV_jra12(Fmi2Slave):
         self.net.load.at[1, "p_mw"] = self.P_load4
         self.net.load.at[0, "q_mvar"] = self.Q_load3
         self.net.load.at[1, "q_mvar"] = self.Q_load4
-        self.net.load.at[1, "p_mw"] = self.P_loadVar
+        self.net.load.at[2, "p_mw"] = self.P_loadVar
+        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ",self.P_loadVar)
         # run power flow
         pp.runpp(self.net, numba=False)
         # obtain bus voltages of buses 3 and 4
