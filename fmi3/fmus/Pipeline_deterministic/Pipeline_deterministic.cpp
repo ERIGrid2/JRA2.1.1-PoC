@@ -141,6 +141,7 @@ Pipeline_deterministic::enterEventMode(
     {
         *( *this->currentEvent_ )->receiver = ( *this->currentEvent_ )->msgId;
         *( *this->currentEvent_ )->clock = fmi3ClockActive;
+        ( *this->currentEvent_ )->valid=fmi3False;
     }
 
     return fmi3OK;
