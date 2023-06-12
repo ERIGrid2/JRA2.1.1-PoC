@@ -16,6 +16,7 @@ namespace DeterministicEventQueue
 	typedef fmi3Int32 MessageID;
 	typedef fmi3Int32* Receiver;
 	typedef fmi3Clock* ReceiverClock;
+	typedef fmi3Boolean Valid;
 
 	struct Event {
 
@@ -23,6 +24,7 @@ namespace DeterministicEventQueue
 		MessageID msgId; // Each event is associated with a message ID.
 		Receiver receiver; // Each message ID is associated to an output variable.
 		ReceiverClock clock; // Each output variable is associated to an output clock.
+		Valid valid; //Set to true upon event creation, set to false when event can be deleted
 
 		// Struct constructor.
 		Event(
@@ -34,7 +36,8 @@ namespace DeterministicEventQueue
             timeStamp( t ),
             msgId( m ),
             receiver( r ),
-            clock( c )
+            clock( c ),
+            valid ( fmi3True )
         {}
 	};
 

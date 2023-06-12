@@ -12,6 +12,8 @@
 #include <stdexcept>
 
 #define INSTANTIATION_TOKEN "{a67992a0-a385-11eb-aea4-00155d0bce5e}"
+//#define DEBUGPRINT
+
 
 using namespace DeterministicEventQueue;
 
@@ -406,8 +408,8 @@ Pipeline_deterministic::updateDiscreteStates(
     }
 
     // Event queue is empty, next event time is undefined.
-    //if ( this->eventQueue_.empty() )
-    if ( this->currentEvent_ == this->eventQueue_.end() )
+    if ( this->eventQueue_.empty() )
+    //if (( this->currentEvent_ == this->eventQueue_.end() ) || (*nextEventTimeDefined == fmi3False))
     {
         this->nextEventTime_ = std::numeric_limits<fmi3Float64>::max();
         *nextEventTimeDefined = fmi3False;
@@ -425,7 +427,9 @@ Pipeline_deterministic::updateDiscreteStates(
         // time of this event as next event time.
         if ( this->currentEvent_ != std::prev( this->eventQueue_.end() ) )
         {
+            DeterministicEventQueue::EventQueue::iterator deletePos=currentEvent_;
             ++( this->currentEvent_ );
+            eventQueue_.erase(deletePos);
 
             this->nextEventTime_ = ( *this->currentEvent_ )->timeStamp;
             *nextEventTimeDefined = fmi3True;
@@ -439,7 +443,13 @@ Pipeline_deterministic::updateDiscreteStates(
         {
             this->nextEventTime_ = std::numeric_limits<fmi3Float64>::max();
             *nextEventTimeDefined = fmi3False;
-
+            if ( this->currentEvent_ != this->eventQueue_.end() ) {
+                if (( *this->currentEvent_ )->valid==fmi3False) {
+                    DeterministicEventQueue::EventQueue::iterator deletePos=currentEvent_;
+                    ++( this->currentEvent_ );
+                    eventQueue_.erase(deletePos);
+                }
+            }
             this->logDebug(
                 "no next event defined"
             );

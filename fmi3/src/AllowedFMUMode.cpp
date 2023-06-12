@@ -7,6 +7,7 @@
 #include "AllowedFMUMode.h"
 #include "InstanceBase.h"
 #include <iostream>
+//#define DEBUGPRINT
 
 bool
 AllowedFMUMode::check(
@@ -16,7 +17,9 @@ AllowedFMUMode::check(
 ) {
     if ( !impl ) { return false; }
 
-    std::cout << "[checkFMUMode:" << name << "] req mode=" << mode << ", impl mode=" << impl->getMode() << std::endl;
+    #ifdef DEBUGPRINT
+      std::cout << "[checkFMUMode:" << name << "] req mode=" << mode << ", impl mode=" << impl->getMode() << std::endl;
+    #endif
 
     if ( !( impl->getMode() & mode ) ) {
         impl->logError( "%s: Illegal call sequence.", name );
